@@ -31,9 +31,10 @@ SetupIconFile=..\..\src\frepple.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
-ArchitecturesAllowed=x64
-ArchitecturesInstallIn64BitMode=x64
-PrivilegesRequired=admin
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 DisableProgramGroupPage=yes
 UninstallDisplayIcon={app}\bin\frepple.exe
 
@@ -208,7 +209,7 @@ end;
 
 function ShouldInstallPostgreSQL: Boolean;
 begin
-  Result := IsComponentSelected('postgresql');
+  Result := WizardIsComponentSelected('postgresql');
 end;
 
 procedure InitializeWizard;
