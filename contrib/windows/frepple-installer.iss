@@ -66,11 +66,11 @@ Name: "startservice"; Description: "Start FrePPLe service after installation"; G
 Name: "firewall"; Description: "Add Windows Firewall exception"; GroupDescription: "Security Options:"
 
 [Files]
-; Core application files
-Source: "..\..\bin\frepple.exe"; DestDir: "{app}\bin"; Flags: ignoreversion; Components: core
-Source: "..\..\bin\frepple.dll"; DestDir: "{app}\bin"; Flags: ignoreversion; Components: core
-Source: "..\..\bin\frepple.xsd"; DestDir: "{app}\share\frepple"; Flags: ignoreversion; Components: core
-Source: "..\..\bin\license.xml"; DestDir: "{app}\etc\frepple"; Flags: ignoreversion; Components: core
+; Core application files (C++ binaries - optional, commented out for Python-only installation)
+; Source: "..\..\bin\frepple.exe"; DestDir: "{app}\bin"; Flags: ignoreversion; Components: core
+; Source: "..\..\bin\frepple.dll"; DestDir: "{app}\bin"; Flags: ignoreversion; Components: core
+; Source: "..\..\bin\frepple.xsd"; DestDir: "{app}\share\frepple"; Flags: ignoreversion; Components: core
+; Source: "..\..\bin\license.xml"; DestDir: "{app}\etc\frepple"; Flags: ignoreversion; Components: core
 
 ; Django application files
 Source: "..\..\freppledb\*"; DestDir: "{app}\share\frepple\freppledb"; Flags: ignoreversion recursesubdirs; Components: core
@@ -174,6 +174,23 @@ var
   DatabaseUserPage: TInputQueryWizardPage;
   WebServerPage: TInputQueryWizardPage;
   AdminUserPage: TInputQueryWizardPage;
+
+// Custom string replace function
+function StringReplaceAll(const S, OldPattern, NewPattern: string): string;
+var
+  Remaining: string;
+  Offset: Integer;
+begin
+  Remaining := S;
+  Result := '';
+  while Pos(OldPattern, Remaining) > 0 do
+  begin
+    Offset := Pos(OldPattern, Remaining);
+    Result := Result + Copy(Remaining, 1, Offset - 1) + NewPattern;
+    Remaining := Copy(Remaining, Offset + Length(OldPattern), Length(Remaining));
+  end;
+  Result := Result + Remaining;
+end;
 
 function NeedsAddPath(Param: string): boolean;
 var
@@ -302,19 +319,19 @@ begin
             Content[I] := 'SECRET_KEY = "' + SecretKey + '"';
           
           if Pos('os.environ.get("POSTGRES_DBNAME","frepple")', Content[I]) > 0 then
-            Content[I] := StringReplace(Content[I], 'os.environ.get("POSTGRES_DBNAME","frepple")', '"' + GetDatabaseName('') + '"', [rfReplaceAll]);
+            Content[I] := StringReplaceAll(Content[I], 'os.environ.get("POSTGRES_DBNAME","frepple")', '"' + GetDatabaseName('') + '"');
           
           if Pos('os.environ.get("POSTGRES_USER", "frepple")', Content[I]) > 0 then
-            Content[I] := StringReplace(Content[I], 'os.environ.get("POSTGRES_USER", "frepple")', '"' + GetDatabaseUser('') + '"', [rfReplaceAll]);
+            Content[I] := StringReplaceAll(Content[I], 'os.environ.get("POSTGRES_USER", "frepple")', '"' + GetDatabaseUser('') + '"');
           
           if Pos('os.environ.get("POSTGRES_PASSWORD", "frepple")', Content[I]) > 0 then
-            Content[I] := StringReplace(Content[I], 'os.environ.get("POSTGRES_PASSWORD", "frepple")', '"' + GetDatabasePassword('') + '"', [rfReplaceAll]);
+            Content[I] := StringReplaceAll(Content[I], 'os.environ.get("POSTGRES_PASSWORD", "frepple")', '"' + GetDatabasePassword('') + '"');
           
           if Pos('os.environ.get("POSTGRES_HOST", "")', Content[I]) > 0 then
-            Content[I] := StringReplace(Content[I], 'os.environ.get("POSTGRES_HOST", "")', '"localhost"', [rfReplaceAll]);
+            Content[I] := StringReplaceAll(Content[I], 'os.environ.get("POSTGRES_HOST", "")', '"localhost"');
           
           if Pos('os.environ.get("POSTGRES_PORT", "")', Content[I]) > 0 then
-            Content[I] := StringReplace(Content[I], 'os.environ.get("POSTGRES_PORT", "")', '"' + GetDatabasePort('') + '"', [rfReplaceAll]);
+            Content[I] := StringReplaceAll(Content[I], 'os.environ.get("POSTGRES_PORT", "")', '"' + GetDatabasePort('') + '"');
         end;
         
         Content.SaveToFile(SettingsFile);
