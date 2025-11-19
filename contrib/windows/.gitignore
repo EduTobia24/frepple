@@ -1,0 +1,9 @@
+# Add the dependencies folder to .gitignore
+dependencies/postgresql/
+dependencies/python/
+dependencies/xerces-c/
+dependencies/libpq/
+dependencies/vcredist/
+
+# But keep the README
+!dependencies/README.md

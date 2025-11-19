@@ -255,6 +255,10 @@ add_subdirectory(doc)
 add_subdirectory(contrib/docker)
 add_subdirectory(contrib/linux)
 
+if(WIN32)
+  add_subdirectory(contrib/windows)
+endif()
+
 # Test suite
 enable_testing()
 add_test(NAME engine
