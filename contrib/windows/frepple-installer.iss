@@ -33,8 +33,7 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=dialog
+PrivilegesRequired=admin
 DisableProgramGroupPage=yes
 UninstallDisplayIcon={app}\bin\frepple.exe
 
@@ -117,8 +116,8 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "http://localhost:8000"; IconFilen
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "http://localhost:8000"; IconFilename: "{app}\bin\frepple.exe"; Tasks: quicklaunchicon
 
 [Registry]
-; Add to PATH
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin;{app}\python;{app}\pgsql\bin"; Check: NeedsAddPath('{app}\bin')
+; Note: PATH modification removed to avoid admin/per-user conflicts
+; Users can manually add to PATH if needed: {app}\bin;{app}\python;{app}\pgsql\bin
 
 ; Application settings
 Root: HKLM; Subkey: "Software\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletekey
@@ -217,11 +216,11 @@ begin
   { PostgreSQL configuration page }
   PostgreSQLPage := CreateInputQueryPage(wpSelectComponents,
     'PostgreSQL Configuration', 'Configure PostgreSQL database settings',
-    'Please enter the PostgreSQL configuration. Use default values if unsure.');
+    'Please enter the PostgreSQL configuration. Port 5433 is used by default to avoid conflicts with existing PostgreSQL installations.');
   PostgreSQLPage.Add('Database name:', False);
   PostgreSQLPage.Add('Port:', False);
   PostgreSQLPage.Values[0] := 'frepple';
-  PostgreSQLPage.Values[1] := '5432';
+  PostgreSQLPage.Values[1] := '5433';
 
   { Database user page }
   DatabaseUserPage := CreateInputQueryPage(PostgreSQLPage.ID,
