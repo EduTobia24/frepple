@@ -13,6 +13,7 @@
 # Executables
 *.exe
 *.dll
+*.zip
 
 # Python
 *.pyc
